@@ -52,8 +52,8 @@ public class CommonChecks {
 	/**
 	 * Decodes Base64 encoded data and returns String based on String encoding passed. 
 	 * <br>If pOutputStringEncoding is passed null or empty default encoding UTF-8 is used.
-	 * @param pEncodedData
-	 * @param pOutputStringEncoding
+	 * @param pEncodedData - Base64 encoded data
+	 * @param pOutputStringEncoding - Encoding for output String
 	 * @return
 	 * @throws UnsupportedEncodingException 
 	 */
