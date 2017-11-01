@@ -1,13 +1,28 @@
 package com.java.utility;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.HashMap;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.java.crypto.KeyLength;
 
 /**
  * Class contains Common checks we perform on day to day basis. Code that we write repeatedly in a jar!
  */
 public class CommonChecks {
 
+	private static KeyGenerator msKeyGenerator_32;
+	private static KeyGenerator msKeyGenerator_16;
+	private static Object msIntrensicLock = new Object();
 	/**
 	 * check is the two Strings are equal
 	 * @param pStringOne
@@ -24,7 +39,6 @@ public class CommonChecks {
 		} else {
 			return pStringOne.equalsIgnoreCase(pStringTwo);
 		}
-		
 	}
 	
 	/**
@@ -63,4 +77,61 @@ public class CommonChecks {
 		String lstrDecodedData =  new String(lbarrDecodedData, lstrStringEncoding);
 		return lstrDecodedData;
 	}
+	
+	/**
+	 * get JSON string for the Map passed.<br>
+	 * No Class Level annotations required to be provided. <br>Keys provided in map or internal maps should be <b>String</b>. These keys would be used as keys in JSON string
+	 * @param pParams
+	 * @param pFQClassName - Fully Qualified name of Class to which object belongs
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
+	public static String getJSONFromObject(HashMap<String, Object> pParams) throws ClassNotFoundException{
+		assert pParams != null && !pParams.isEmpty();
+		
+		JSONObject lObject = new JSONObject();
+		lObject.putAll(pParams);
+		return lObject.toJSONString();
+	}
+	
+	/**
+	 * Get a Object from valid JSON String passed.<br>
+	 * Return java.lang.Object, cast it to desired object
+	 * @param pJSONString
+	 * @param pFQClassName
+	 * @return
+	 * @throws ParseException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object getObjectFromJSONString(String pJSONString, String pFQClassName) throws ParseException, ClassNotFoundException{
+		assert !isStringEmpty(pJSONString) && !isStringEmpty(pFQClassName);
+		
+		JSONParser lParser = new JSONParser();
+		Object lObject = lParser.parse(pJSONString);
+		return lObject;
+	}
+	
+	public static SecretKey generateKey(KeyLength pKeyLength, String pAlogrithm) throws NoSuchAlgorithmException {
+		synchronized (msIntrensicLock) {
+			SecureRandom lSecRandom =  new SecureRandom();
+			SecretKey lKey = null;	
+			
+			if(pKeyLength.equals(KeyLength.KEY_SIZE_128)) {
+				if(msKeyGenerator_16 == null) {
+					msKeyGenerator_16 = KeyGenerator.getInstance(pAlogrithm);
+					msKeyGenerator_16.init(pKeyLength.getKeySiz(), lSecRandom);
+				}
+				lKey = msKeyGenerator_16.generateKey();
+			}
+			else if(pKeyLength.equals(KeyLength.KEY_SIZE_256)){
+				if(msKeyGenerator_32 == null) {
+					msKeyGenerator_32 = KeyGenerator.getInstance(pAlogrithm);
+					msKeyGenerator_32.init(pKeyLength.getKeySiz(), lSecRandom);
+				}
+				lKey = msKeyGenerator_32.generateKey();
+			}
+			return lKey;
+		}		
+	}
+	
 }
