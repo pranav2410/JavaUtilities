@@ -1,28 +1,19 @@
 package com.java.utility;
 
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import com.java.crypto.KeyLength;
 
 /**
  * Class contains Common checks we perform on day to day basis. Code that we write repeatedly in a jar!
  */
 public class CommonChecks {
 
-	private static KeyGenerator msKeyGenerator_32;
-	private static KeyGenerator msKeyGenerator_16;
-	private static Object msIntrensicLock = new Object();
+	
 	/**
 	 * check is the two Strings are equal
 	 * @param pStringOne
@@ -109,29 +100,5 @@ public class CommonChecks {
 		JSONParser lParser = new JSONParser();
 		Object lObject = lParser.parse(pJSONString);
 		return lObject;
-	}
-	
-	public static SecretKey generateKey(KeyLength pKeyLength, String pAlogrithm) throws NoSuchAlgorithmException {
-		synchronized (msIntrensicLock) {
-			SecureRandom lSecRandom =  new SecureRandom();
-			SecretKey lKey = null;	
-			
-			if(pKeyLength.equals(KeyLength.KEY_SIZE_128)) {
-				if(msKeyGenerator_16 == null) {
-					msKeyGenerator_16 = KeyGenerator.getInstance(pAlogrithm);
-					msKeyGenerator_16.init(pKeyLength.getKeySiz(), lSecRandom);
-				}
-				lKey = msKeyGenerator_16.generateKey();
-			}
-			else if(pKeyLength.equals(KeyLength.KEY_SIZE_256)){
-				if(msKeyGenerator_32 == null) {
-					msKeyGenerator_32 = KeyGenerator.getInstance(pAlogrithm);
-					msKeyGenerator_32.init(pKeyLength.getKeySiz(), lSecRandom);
-				}
-				lKey = msKeyGenerator_32.generateKey();
-			}
-			return lKey;
-		}		
-	}
-	
+	}	
 }
