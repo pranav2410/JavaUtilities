@@ -2,6 +2,7 @@ package com.java.utility;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.Formatter;
 import java.util.HashMap;
 
 import org.json.simple.JSONObject;
@@ -101,4 +102,26 @@ public class CommonChecks {
 		Object lObject = lParser.parse(pJSONString);
 		return lObject;
 	}	
+	
+	public static String toHexString(byte[] pData) {
+		Formatter lFormatter =  new Formatter();
+		for(byte lbyte: pData) {
+			lFormatter.format("%20x", lbyte);
+		}
+		String lHexString = lFormatter.toString();
+
+		lFormatter.close();
+		lFormatter = null;
+		return lHexString;	
+	}
+	
+	public static String generateRandomString(int pLength, boolean pCaps, boolean pAlphaNumeric) {
+		// generate a random String of length pLength
+		// with 
+	
+		return null;
+	}
+	
+	
+	
 }
